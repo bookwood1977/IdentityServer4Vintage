@@ -248,7 +248,8 @@ namespace IdentityServer.UnitTests.Validation.Setup
             IReferenceTokenStore store = null, 
             IRefreshTokenStore refreshTokenStore = null,
             IProfileService profile = null, 
-            IdentityServerOptions options = null, ISystemClock clock = null)
+            IdentityServerOptions options = null, 
+            TimeProvider timeProvider = null)
         {
             if (options == null)
             {
@@ -265,7 +266,7 @@ namespace IdentityServer.UnitTests.Validation.Setup
                 store = CreateReferenceTokenStore();
             }
 
-            clock = clock ?? new StubClock();
+            timeProvider = timeProvider ?? new StubClock();
 
             if (refreshTokenStore == null)
             {
@@ -284,7 +285,7 @@ namespace IdentityServer.UnitTests.Validation.Setup
 
             var validator = new TokenValidator(
                 clients: clients,
-                clock: clock,
+                timeProvider: timeProvider,
                 profile: profile,
                 referenceTokenStore: store,
                 refreshTokenStore: refreshTokenStore,
@@ -301,13 +302,13 @@ namespace IdentityServer.UnitTests.Validation.Setup
             IDeviceFlowCodeService service,
             IProfileService profile = null,
             IDeviceFlowThrottlingService throttlingService = null,
-            ISystemClock clock = null)
+            TimeProvider timeProvider = null)
         {
             profile = profile ?? new TestProfileService();
             throttlingService = throttlingService ?? new TestDeviceFlowThrottlingService();
-            clock = clock ?? new StubClock();
+            timeProvider = timeProvider ?? new StubClock();
             
-            var validator = new DeviceCodeValidator(service, profile, throttlingService, clock, TestLogger.Create<DeviceCodeValidator>());
+            var validator = new DeviceCodeValidator(service, profile, throttlingService, timeProvider, TestLogger.Create<DeviceCodeValidator>());
 
             return validator;
         }

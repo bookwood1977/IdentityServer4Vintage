@@ -27,7 +27,7 @@ namespace IdentityServer4.Services
         /// <summary>
         /// The system clock;
         /// </summary>
-        protected ISystemClock Clock { get; }
+        protected TimeProvider TimeProvider { get; }
         
         /// <summary>
         /// The IdentityServerTools used to create and the JWT.
@@ -52,19 +52,19 @@ namespace IdentityServer4.Services
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="clock"></param>
+        /// <param name="timeProvider"></param>
         /// <param name="tools"></param>
         /// <param name="logoutNotificationService"></param>
         /// <param name="backChannelLogoutHttpClient"></param>
         /// <param name="logger"></param>
         public DefaultBackChannelLogoutService(
-            ISystemClock clock,
+            TimeProvider timeProvider,
             IdentityServerTools tools,
             ILogoutNotificationService logoutNotificationService,
             IBackChannelLogoutHttpClient backChannelLogoutHttpClient,
             ILogger<IBackChannelLogoutService> logger)
         {
-            Clock = clock;
+            TimeProvider = timeProvider;
             Tools = tools;
             LogoutNotificationService = logoutNotificationService;
             HttpClient = backChannelLogoutHttpClient;
@@ -164,7 +164,7 @@ namespace IdentityServer4.Services
             {
                 new Claim(JwtClaimTypes.Subject, request.SubjectId),
                 new Claim(JwtClaimTypes.Audience, request.ClientId),
-                new Claim(JwtClaimTypes.IssuedAt, Clock.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+                new Claim(JwtClaimTypes.IssuedAt, TimeProvider.GetUtcNow().ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
                 new Claim(JwtClaimTypes.JwtId, CryptoRandom.CreateUniqueId(16, CryptoRandom.OutputFormat.Hex)),
                 new Claim(JwtClaimTypes.Events, json, IdentityServerConstants.ClaimValueTypes.Json)
             };

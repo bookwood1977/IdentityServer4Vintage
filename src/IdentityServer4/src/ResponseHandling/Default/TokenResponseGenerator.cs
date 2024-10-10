@@ -55,21 +55,21 @@ namespace IdentityServer4.ResponseHandling
         /// <summary>
         ///  The clock
         /// </summary>
-        protected readonly ISystemClock Clock;
+        protected readonly TimeProvider TimeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TokenResponseGenerator" /> class.
         /// </summary>
-        /// <param name="clock">The clock.</param>
+        /// <param name="timeProvider">The clock.</param>
         /// <param name="tokenService">The token service.</param>
         /// <param name="refreshTokenService">The refresh token service.</param>
         /// <param name="scopeParser">The scope parser.</param>
         /// <param name="resources">The resources.</param>
         /// <param name="clients">The clients.</param>
         /// <param name="logger">The logger.</param>
-        public TokenResponseGenerator(ISystemClock clock, ITokenService tokenService, IRefreshTokenService refreshTokenService, IScopeParser scopeParser, IResourceStore resources, IClientStore clients, ILogger<TokenResponseGenerator> logger)
+        public TokenResponseGenerator(TimeProvider timeProvider, ITokenService tokenService, IRefreshTokenService refreshTokenService, IScopeParser scopeParser, IResourceStore resources, IClientStore clients, ILogger<TokenResponseGenerator> logger)
         {
-            Clock = clock;
+            TimeProvider = timeProvider;
             TokenService = tokenService;
             RefreshTokenService = refreshTokenService;
             ScopeParser = scopeParser;
@@ -227,7 +227,7 @@ namespace IdentityServer4.ResponseHandling
             }
             else
             {
-                oldAccessToken.CreationTime = Clock.UtcNow.UtcDateTime;
+                oldAccessToken.CreationTime = TimeProvider.GetUtcNow().UtcDateTime;
                 oldAccessToken.Lifetime = request.ValidatedRequest.AccessTokenLifetime;
 
                 accessTokenString = await TokenService.CreateSecurityTokenAsync(oldAccessToken);

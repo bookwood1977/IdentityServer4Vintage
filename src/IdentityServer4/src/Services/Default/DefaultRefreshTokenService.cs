@@ -12,6 +12,7 @@ using IdentityModel;
 using IdentityServer4.Logging.Models;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Authentication;
+using System;
 
 namespace IdentityServer4.Services
 {
@@ -38,22 +39,22 @@ namespace IdentityServer4.Services
         /// <summary>
         /// The clock
         /// </summary>
-        protected ISystemClock Clock { get; }
+        protected TimeProvider TimeProvider { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRefreshTokenService" /> class.
         /// </summary>
         /// <param name="refreshTokenStore">The refresh token store</param>
         /// <param name="profile"></param>
-        /// <param name="clock">The clock</param>
+        /// <param name="timeProvider">The clock</param>
         /// <param name="logger">The logger</param>
         public DefaultRefreshTokenService(IRefreshTokenStore refreshTokenStore, IProfileService profile,
-            ISystemClock clock,
+            TimeProvider timeProvider,
             ILogger<DefaultRefreshTokenService> logger)
         {
             RefreshTokenStore = refreshTokenStore;
             Profile = profile;
-            Clock = clock;
+            TimeProvider = timeProvider;
 
             Logger = logger;
         }
@@ -86,7 +87,7 @@ namespace IdentityServer4.Services
             /////////////////////////////////////////////
             // check if refresh token has expired
             /////////////////////////////////////////////
-            if (refreshToken.CreationTime.HasExceeded(refreshToken.Lifetime, Clock.UtcNow.DateTime))
+            if (refreshToken.CreationTime.HasExceeded(refreshToken.Lifetime, TimeProvider.GetUtcNow().DateTime))
             {
                 Logger.LogWarning("Refresh token has expired.");
                 return invalidGrant;
@@ -198,7 +199,8 @@ namespace IdentityServer4.Services
 
             var refreshToken = new RefreshToken
             {
-                CreationTime = Clock.UtcNow.UtcDateTime, Lifetime = lifetime, AccessToken = accessToken
+                CreationTime = TimeProvider.GetUtcNow().UtcDateTime, Lifetime = lifetime, AccessToken = accessToken
+                
             };
 
             var handle = await RefreshTokenStore.StoreRefreshTokenAsync(refreshToken);
@@ -229,7 +231,7 @@ namespace IdentityServer4.Services
                 // flag as consumed
                 if (refreshToken.ConsumedTime == null)
                 {
-                    refreshToken.ConsumedTime = Clock.UtcNow.UtcDateTime;
+                    refreshToken.ConsumedTime = TimeProvider.GetUtcNow().UtcDateTime;
                     await RefreshTokenStore.UpdateRefreshTokenAsync(handle, refreshToken);
                 }
 
@@ -243,7 +245,7 @@ namespace IdentityServer4.Services
 
                 // if absolute exp > 0, make sure we don't exceed absolute exp
                 // if absolute exp = 0, allow indefinite slide
-                var currentLifetime = refreshToken.CreationTime.GetLifetimeInSeconds(Clock.UtcNow.UtcDateTime);
+                var currentLifetime = refreshToken.CreationTime.GetLifetimeInSeconds(TimeProvider.GetUtcNow().UtcDateTime);
                 Logger.LogDebug("Current lifetime: {currentLifetime}", currentLifetime.ToString());
 
                 var newLifetime = currentLifetime + client.SlidingRefreshTokenLifetime;

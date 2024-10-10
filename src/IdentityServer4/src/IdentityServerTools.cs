@@ -22,19 +22,19 @@ namespace IdentityServer4
     {
         internal readonly IHttpContextAccessor ContextAccessor;
         private readonly ITokenCreationService _tokenCreation;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _timeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IdentityServerTools" /> class.
         /// </summary>
         /// <param name="contextAccessor">The context accessor.</param>
         /// <param name="tokenCreation">The token creation service.</param>
-        /// <param name="clock">The clock.</param>
-        public IdentityServerTools(IHttpContextAccessor contextAccessor, ITokenCreationService tokenCreation, ISystemClock clock)
+        /// <param name="timeProvider">The clock.</param>
+        public IdentityServerTools(IHttpContextAccessor contextAccessor, ITokenCreationService tokenCreation, TimeProvider timeProvider)
         {
             ContextAccessor = contextAccessor;
             _tokenCreation = tokenCreation;
-            _clock = clock;
+            _timeProvider = timeProvider;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace IdentityServer4
 
             var token = new Token
             {
-                CreationTime = _clock.UtcNow.UtcDateTime,
+                CreationTime = _timeProvider.GetUtcNow().UtcDateTime,
                 Issuer = issuer,
                 Lifetime = lifetime,
 
@@ -77,7 +77,7 @@ namespace IdentityServer4
 
             var token = new Token
             {
-                CreationTime = _clock.UtcNow.UtcDateTime,
+                CreationTime = _timeProvider.GetUtcNow().UtcDateTime,
                 Issuer = issuer,
                 Lifetime = lifetime,
 

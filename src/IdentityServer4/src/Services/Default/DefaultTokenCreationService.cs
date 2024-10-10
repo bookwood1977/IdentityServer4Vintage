@@ -35,7 +35,7 @@ namespace IdentityServer4.Services
         /// <summary>
         ///  The clock
         /// </summary>
-        protected readonly ISystemClock Clock;
+        protected readonly TimeProvider TimeProvider;
 
         /// <summary>
         /// The options
@@ -45,17 +45,17 @@ namespace IdentityServer4.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTokenCreationService"/> class.
         /// </summary>
-        /// <param name="clock">The options.</param>
+        /// <param name="timeProvider">The options.</param>
         /// <param name="keys">The keys.</param>
         /// <param name="options">The options.</param>
         /// <param name="logger">The logger.</param>
         public DefaultTokenCreationService(
-            ISystemClock clock,
+            TimeProvider timeProvider,
             IKeyMaterialService keys,
             IdentityServerOptions options,
             ILogger<DefaultTokenCreationService> logger)
         {
-            Clock = clock;
+            TimeProvider = timeProvider;
             Keys = keys;
             Options = options;
             Logger = logger;
@@ -96,7 +96,7 @@ namespace IdentityServer4.Services
             if (credential.Key is X509SecurityKey x509Key)
             {
                 var cert = x509Key.Certificate;
-                if (Clock.UtcNow.UtcDateTime > cert.NotAfter)
+                if (TimeProvider.GetUtcNow().UtcDateTime > cert.NotAfter)
                 {
                     Logger.LogWarning("Certificate {subjectName} has expired on {expiration}", cert.Subject, cert.NotAfter.ToString(CultureInfo.InvariantCulture));
                 }
@@ -122,7 +122,7 @@ namespace IdentityServer4.Services
         /// <returns>The JWT payload</returns>
         protected virtual Task<JwtPayload> CreatePayloadAsync(Token token)
         {
-            var payload = token.CreateJwtPayload(Clock, Options, Logger);
+            var payload = token.CreateJwtPayload(TimeProvider.System, Options, Logger);
             return Task.FromResult(payload);
         }
 

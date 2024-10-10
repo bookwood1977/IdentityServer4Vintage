@@ -32,7 +32,7 @@ namespace IdentityServer4.Validation
         private readonly IClientStore _clients;
         private readonly IProfileService _profile;
         private readonly IKeyMaterialService _keys;
-        private readonly ISystemClock _clock;
+        private readonly TimeProvider _timeProvider;
         private readonly TokenValidationLog _log;
 
         public TokenValidator(
@@ -44,7 +44,7 @@ namespace IdentityServer4.Validation
             IRefreshTokenStore refreshTokenStore,
             ICustomTokenValidator customValidator,
             IKeyMaterialService keys,
-            ISystemClock clock,
+            TimeProvider timeProvider,
             ILogger<TokenValidator> logger)
         {
             _options = options;
@@ -54,7 +54,7 @@ namespace IdentityServer4.Validation
             _referenceTokenStore = referenceTokenStore;
             _customValidator = customValidator;
             _keys = keys;
-            _clock = clock;
+            _timeProvider = timeProvider;
             _logger = logger;
 
             _log = new TokenValidationLog();
@@ -286,7 +286,7 @@ namespace IdentityServer4.Validation
 
                     }
                 }
-                
+
                 // if access token contains an ID, log it
                 var jwtId = id.FindFirst(JwtClaimTypes.JwtId);
                 if (jwtId != null)
@@ -307,7 +307,7 @@ namespace IdentityServer4.Validation
                 }
 
                 var claims = id.Claims.ToList();
-                
+
                 // check the scope format (array vs space delimited string)
                 var scopes = claims.Where(c => c.Type == JwtClaimTypes.Scope).ToArray();
                 if (scopes.Any())
@@ -317,7 +317,7 @@ namespace IdentityServer4.Validation
                         if (scope.Value.Contains(" "))
                         {
                             claims.Remove(scope);
-                            
+
                             var values = scope.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                             foreach (var value in values)
                             {
@@ -359,7 +359,7 @@ namespace IdentityServer4.Validation
                 return Invalid(OidcConstants.ProtectedResourceErrors.InvalidToken);
             }
 
-            if (token.CreationTime.HasExceeded(token.Lifetime, _clock.UtcNow.UtcDateTime))
+            if (token.CreationTime.HasExceeded(token.Lifetime, _timeProvider.GetUtcNow().UtcDateTime))
             {
                 LogError("Token expired.");
 

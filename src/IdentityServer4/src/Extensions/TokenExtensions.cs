@@ -25,20 +25,20 @@ namespace IdentityServer4.Extensions
         /// Creates the default JWT payload.
         /// </summary>
         /// <param name="token">The token.</param>
-        /// <param name="clock">The clock.</param>
+        /// <param name="timeProvider">The clock.</param>
         /// <param name="options">The options</param>
         /// <param name="logger">The logger.</param>
         /// <returns></returns>
         /// <exception cref="Exception">
         /// </exception>
-        public static JwtPayload CreateJwtPayload(this Token token, ISystemClock clock, IdentityServerOptions options, ILogger logger)
+        public static JwtPayload CreateJwtPayload(this Token token, TimeProvider timeProvider, IdentityServerOptions options, ILogger logger)
         {
             var payload = new JwtPayload(
                 token.Issuer,
                 null,
                 null,
-                clock.UtcNow.UtcDateTime,
-                clock.UtcNow.UtcDateTime.AddSeconds(token.Lifetime));
+                timeProvider.GetUtcNow().UtcDateTime,
+                timeProvider.GetUtcNow().UtcDateTime.AddSeconds(token.Lifetime));
 
             foreach (var aud in token.Audiences)
             {
