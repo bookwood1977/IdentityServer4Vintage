@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <PackageId>IdentityServer4</PackageId>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Description>OpenID Connect and OAuth 2.0 Framework for ASP.NET Core</Description>
-    <Authors>Brock Allen;Dominick Baier</Authors>
+    <PackageId>IdentityServer4Vintage</PackageId>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>Fork of IdentityServer4 - OpenID Connect and OAuth 2.0 Framework for ASP.NET Core</Description>
+    <Authors>Origin: Brock Allen;Dominick Baier</Authors>
     <AssemblyName>IdentityServer4</AssemblyName>
     <PackageTags>OAuth2;OAuth 2.0;OpenID Connect;Security;Identity;IdentityServer</PackageTags>
     <PackageIcon>icon.jpg</PackageIcon>
-    <PackageProjectUrl>https://github.com/IdentityServer/IdentityServer4</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/bookwood1977/IdentityServer4Vintage</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageReleaseNotes>https://github.com/IdentityServer/IdentityServer4/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/bookwood1977/IdentityServer4Vintage/releases</PackageReleaseNotes>
 
     <!-- Declare that the Repository URL can be published to NuSpec -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -40,13 +40,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityServer4.Storage" />
-    <PackageReference Include="IdentityModel" />
+    <PackageReference Include="IdentityModel" Version="7.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.1.2" />
 
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.10" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
 
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Storage\src\IdentityServer4.Storage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MinVer" Version="6.0.0" />
   </ItemGroup>
 </Project>
